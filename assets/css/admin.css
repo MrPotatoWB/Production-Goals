@@ -1,0 +1,620 @@
+/**
+ * Production Goals - Admin Styles
+ */
+
+/* Main container */
+.pg-admin-wrap {
+    margin: 20px 0;
+    max-width: 1200px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Cards */
+.pg-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.pg-card-header {
+    padding: 1rem 1.25rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pg-card-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.pg-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pg-card-content {
+    padding: 1.25rem;
+}
+
+.pg-centered-content {
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Status labels */
+.pg-status-label {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.pg-status-active {
+    background-color: #00a32a;
+    color: white;
+}
+
+.pg-status-inactive {
+    background-color: #787c82;
+    color: white;
+}
+
+.pg-status-recent {
+    background-color: #dba617;
+    color: white;
+}
+
+/* Project selector */
+.pg-project-selector-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pg-project-selector-container form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.pg-select {
+    flex-grow: 1;
+    padding: 0.375rem 0.75rem;
+    max-width: 500px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font-size: 14px;
+    height: 32px;
+}
+
+/* Forms */
+.pg-form-container {
+    max-width: 800px;
+    margin-bottom: 1.5rem;
+}
+
+.pg-add-part-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ddd;
+}
+
+.pg-form-row {
+    margin-bottom: 1rem;
+}
+
+.pg-form-row label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 500;
+}
+
+.pg-form-row input[type="text"],
+.pg-form-row input[type="number"],
+.pg-form-row input[type="url"],
+.pg-form-row select,
+.pg-form-row textarea {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.pg-form-help {
+    margin-top: 0.25rem;
+    color: #646970;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
+.pg-form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.pg-role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.pg-role-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.pg-inline-form {
+    display: inline-block;
+}
+
+/* Current file */
+.pg-current-file {
+    margin: 0.5rem 0;
+    padding: 0.5rem 0.75rem;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    color: #3c434a;
+}
+
+.pg-file-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Parts table */
+.pg-parts-table-container {
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+}
+
+.pg-parts-table th,
+.pg-parts-table td {
+    vertical-align: middle;
+}
+
+.pg-progress-cell {
+    min-width: 200px;
+}
+
+.pg-progress-text {
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.pg-progress-bar-container {
+    height: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pg-progress-bar {
+    height: 100%;
+    background-color: #2271b1;
+    border-radius: 4px;
+}
+
+.pg-actions-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+}
+
+/* Contributions */
+.pg-contributions-container {
+    padding: 1rem;
+    background-color: #f9f9fa;
+    border-radius: 3px;
+}
+
+.pg-contributions-container h4 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+}
+
+.pg-contributions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pg-contributions-table th,
+.pg-contributions-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.pg-contributions-table th {
+    font-weight: 600;
+    background-color: #f0f0f0;
+}
+
+/* Buttons */
+.button-danger {
+    color: #a00 !important;
+    border-color: #a00 !important;
+}
+
+.button-danger:hover {
+    color: #dc3232 !important;
+    border-color: #dc3232 !important;
+}
+
+/* Shortcodes */
+.pg-shortcodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.pg-shortcode-item {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 1rem;
+}
+
+.pg-shortcode-item h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-family: monospace;
+    color: #2271b1;
+}
+
+.pg-shortcode-item p {
+    margin-bottom: 0.75rem;
+}
+
+/* Modal */
+.pg-modal {
+    display: none;
+    position: fixed;
+    z-index: 100000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.pg-modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pg-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.pg-modal-close:hover {
+    color: #555;
+}
+
+/* Active projects in Goals page */
+.pg-active-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.pg-project-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pg-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+.pg-project-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.pg-active-parts-list {
+    padding: 1rem;
+}
+
+.pg-part-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pg-part-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.pg-part-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.pg-part-name {
+    font-weight: 600;
+}
+
+.pg-part-date {
+    font-size: 0.8125rem;
+    color: #646970;
+}
+
+.pg-progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.375rem;
+}
+
+/* Completed goals section */
+.pg-completed-goals-accordion {
+    margin-top: 1rem;
+}
+
+.pg-completed-goal {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pg-completed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.pg-completed-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.pg-completed-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.pg-completion-date {
+    font-weight: normal;
+    color: #646970;
+}
+
+.pg-contributor-count {
+    font-size: 0.875rem;
+    color: #2271b1;
+}
+
+.pg-completed-details {
+    padding: 1rem;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+}
+
+.pg-loading-indicator {
+    text-align: center;
+    padding: 1rem;
+    color: #646970;
+    font-style: italic;
+}
+
+.pg-contributions-list {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.pg-contributions-list li {
+    margin-bottom: 0.25rem;
+}
+
+/* Admin notices */
+.pg-admin-notice {
+    margin: 1rem 0;
+}
+
+.pg-processing-notice {
+    display: flex;
+    align-items: center;
+}
+
+.pg-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    border: 2px solid #646970;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: pg-spin 1s linear infinite;
+}
+
+@keyframes pg-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Info card */
+.pg-info-card {
+    background-color: #f0f7ff;
+}
+
+.pg-info-list {
+    margin-left: 1.5rem;
+}
+
+.pg-info-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* Empty states */
+.pg-empty-message {
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    color: #646970;
+    font-style: italic;
+}
+
+/* Statistics section */
+.pg-stats-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ddd;
+}
+
+.pg-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.pg-stat-item {
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.pg-stat-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    color: #646970;
+}
+
+.pg-stat-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2271b1;
+}
+
+.pg-recent-downloads {
+    margin-top: 1.5rem;
+}
+
+.pg-recent-downloads h4 {
+    margin-bottom: 0.75rem;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 782px) {
+    .pg-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pg-card-actions {
+        margin-top: 0.75rem;
+    }
+    
+    .pg-project-selector-container form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pg-select {
+        width: 100%;
+        max-width: none;
+        margin-bottom: 0.75rem;
+    }
+    
+    .pg-shortcodes-grid,
+    .pg-active-projects-grid,
+    .pg-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pg-form-actions {
+        flex-direction: column;
+    }
+    
+    .pg-form-actions .button {
+        width: 100%;
+    }
+    
+    .pg-completed-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pg-completed-actions {
+        margin-top: 0.75rem;
+    }
+    
+    .pg-role-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+/* Print styles */
+@media print {
+    .pg-card {
+        break-inside: avoid;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    
+    .button,
+    .pg-form-actions,
+    .pg-file-actions {
+        display: none !important;
+    }
+}

@@ -1,0 +1,1080 @@
+/**
+ * Production Goals - Public Styles with Ukraine Colors
+ * Blue: #0057b7
+ * Yellow: #ffd700
+ */
+
+/* Global Elements */
+.pg-container {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #333;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Progress Bars */
+.pg-progress-wrapper {
+    margin: 5px 0 15px;
+}
+
+.pg-progress-numbers {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+.pg-progress-bar-container {
+    background-color: #e9ecef;
+    border-radius: 4px;
+    height: 10px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.pg-progress-bar {
+    background-color: #ffd700; /* Ukraine yellow */
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: width 0.4s ease;
+}
+
+/* Tabs */
+.pg-tabs {
+    margin: 20px 0;
+    background: #fff;
+}
+
+.pg-tabs-nav {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #dee2e6;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.pg-tab-button {
+    padding: 0.5rem 1rem;
+    margin-bottom: -1px;
+    background: none;
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    cursor: pointer;
+    color: #0057b7; /* Ukraine blue */
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.pg-tab-button:hover {
+    color: #003b7e; /* Darker blue */
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.pg-tab-button.pg-active {
+    color: #495057;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.pg-tab {
+    display: none;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    background: #fff;
+    color: #333;
+}
+
+.pg-tab.pg-active {
+    display: block;
+}
+
+/* Cards */
+.pg-card {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    color: #333;
+}
+
+.pg-card-header {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.pg-card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.pg-card-content {
+    padding: 1.25rem;
+}
+
+/* Project Cards */
+.pg-project-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: #333;
+}
+
+.pg-project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pg-project-image {
+    overflow: hidden;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.pg-project-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+    transition: transform 0.3s ease;
+}
+
+.pg-project-image img:hover {
+    transform: scale(1.05);
+}
+
+.pg-project-details {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.pg-project-title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.pg-project-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.pg-project-title a:hover {
+    color: #0057b7; /* Ukraine blue */
+}
+
+.pg-project-materials,
+.pg-project-remaining,
+.pg-project-percentage {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.pg-materials-label {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Tables */
+.pg-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.pg-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    color: #333;
+}
+
+.pg-table th,
+.pg-table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    text-align: left;
+    color: #333;
+}
+
+.pg-table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #0057b7; /* Ukraine blue */
+    font-weight: 600;
+    color: white;
+}
+
+.pg-table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+.pg-table tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* Buttons */
+.pg-button {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    color: #fff;
+    background-color: #0057b7; /* Ukraine blue */
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.pg-button:hover {
+    color: #fff;
+    background-color: #003b7e; /* Darker blue */
+}
+
+.pg-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.pg-button-small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+}
+
+.pg-button-success {
+    background-color: #28a745;
+}
+
+.pg-button-success:hover {
+    background-color: #218838;
+}
+
+.pg-button-danger {
+    background-color: #555; /* Neutral gray instead of red */
+}
+
+.pg-button-danger:hover {
+    background-color: #444; /* Darker gray */
+}
+
+.pg-button-secondary {
+    background-color: #6c757d;
+}
+
+.pg-button-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Forms */
+.pg-form-row {
+    margin-bottom: 1rem;
+}
+
+.pg-form-row label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.pg-form-row input[type="text"],
+.pg-form-row input[type="number"],
+.pg-form-row input[type="email"],
+.pg-form-row select,
+.pg-form-row textarea {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333 !important;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.pg-form-row input:focus,
+.pg-form-row select:focus,
+.pg-form-row textarea:focus {
+    border-color: #ffd700; /* Ukraine yellow */
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+}
+
+.pg-form-row input[type="number"] {
+    width: auto;
+    min-width: 80px;
+}
+
+/* Messages */
+.pg-message {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    position: relative;
+}
+
+.pg-message p {
+    margin: 0;
+    color: inherit;
+}
+
+.pg-message-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.pg-message-info {
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
+
+.pg-message-success {
+    color: #fff;
+    background-color: #0057b7; /* Ukraine blue */
+    border-color: #003b7e;
+}
+
+.pg-message-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.pg-message-error {
+    color: #fff;
+    background-color: #555; /* Neutral gray instead of red */
+    border-color: #444;
+}
+
+/* Loader */
+.pg-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.pg-loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0057b7; /* Ukraine blue */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.pg-loader-text {
+    margin-top: 0.5rem;
+    color: #6c757d;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Contribution Card */
+.pg-contribution-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+    background: #fff;
+}
+
+.pg-contribution-section {
+    flex: 1;
+    min-width: 200px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #333;
+}
+
+.pg-contribution-section:nth-child(1) {
+    background-color: #e3f2fd;
+    color: #0057b7; /* Ukraine blue */
+}
+
+.pg-contribution-section:nth-child(2) {
+    background-color: #fffae6; /* Light yellow background */
+    color: #947600; /* Dark yellow text */
+}
+
+.pg-contribution-section:nth-child(3) {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+}
+
+.pg-contribution-percentage {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+/* My Projects Interface */
+.pg-my-projects-container {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    color: #333;
+}
+
+.pg-section {
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.pg-section-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.pg-empty-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.pg-edit-submission-form {
+    display: none;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+    color: #333;
+}
+
+.pg-success-message {
+    background-color: #0057b7; /* Ukraine blue */
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    margin: 1rem 0;
+    border-radius: 0.25rem;
+    border: 1px solid #003b7e;
+}
+
+.pg-error-message {
+    background-color: #555; /* Neutral gray instead of red */
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    margin: 1rem 0;
+    border-radius: 0.25rem;
+    border: 1px solid #444;
+}
+
+/* Production Goals Ticker */
+.production-ticker-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
+
+.production-ticker-container {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.production-ticker {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
+    width: max-content;
+    animation: ticker-scroll 20s linear infinite;
+}
+
+@keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.ticker-item {
+    flex: 0 0 auto;
+    min-width: 180px;
+}
+
+.ticker-tile {
+    background: white;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ticker-project-image {
+    height: 90px;
+    width: 90px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.ticker-project-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #0057b7 !important; /* Ukraine blue */
+}
+
+.ticker-contributors {
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.ticker-user {
+    font-size: 0.8125rem;
+    margin: 0.25rem 0;
+    color: #333;
+}
+
+/* Production Goal Progress */
+.production-progress {
+    max-width: 800px;
+    margin: 0 auto 30px;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    color: #333;
+}
+
+.production-progress h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.progress-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.progress-table th,
+.progress-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: center;
+    color: #333;
+}
+
+.progress-table th {
+    background: #0057b7; /* Ukraine blue */
+    color: white;
+}
+
+.progress-table input {
+    width: 60px;
+    text-align: center;
+    padding: 0.375rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+    color: #333 !important;
+}
+
+.submit-button {
+    display: block;
+    width: 100%;
+    background: #0057b7; /* Ukraine blue */
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1.125rem;
+    font-weight: bold;
+    transition: background 0.2s ease-in-out;
+}
+
+.submit-button:hover {
+    background: #003b7e; /* Darker blue */
+}
+
+.submit-button:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Project Grids */
+.all-projects-grid,
+.static-unfulfilled-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.project-tile {
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.project-title {
+    margin: 0.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #333 !important;
+}
+
+.project-title a {
+    color: #333 !important;
+    text-decoration: none;
+}
+
+.project-title a:hover {
+    color: #0057b7 !important; /* Ukraine blue */
+}
+
+/* Search Bar */
+.project-search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+#project-search {
+    padding: 0.625rem;
+    width: 60%;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    color: #333 !important;
+}
+
+#project-search::placeholder {
+    color: #666 !important;
+}
+
+#search-button {
+    padding: 0.625rem 1.125rem;
+    background: #0057b7; /* Ukraine blue */
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+#search-button:hover {
+    background: #003b7e; /* Darker blue */
+}
+
+/* Pagination */
+.pagination-container {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.pagination-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #0057b7; /* Ukraine blue */
+    color: white !important;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    margin: 0 0.25rem;
+    transition: background 0.2s ease-in-out;
+}
+
+.pagination-button:hover {
+    background: #003b7e; /* Darker blue */
+    color: white !important;
+}
+
+.active-page {
+    background: #003b7e !important; /* Darker blue */
+    font-weight: bold;
+    color: white !important;
+}
+
+/* Group Totals */
+.group-totals {
+    background-color: #0057b7; /* Ukraine blue */
+    color: white !important;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    text-align: center;
+}
+
+.group-totals h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: white !important;
+}
+
+.group-totals p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: white !important;
+}
+
+.group-totals p strong {
+    color: #ffd700 !important; /* Ukraine yellow */
+}
+
+/* User Contributions */
+.user-contributions {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #0057b7; /* Ukraine blue */
+    color: white !important;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-contributions h2, 
+.user-contributions h3 {
+    text-align: center;
+    color: white !important;
+    margin-bottom: 15px;
+}
+
+.user-contributions p {
+    color: white !important;
+    margin: 8px 0;
+}
+
+.user-contributions p strong {
+    color: #ffd700 !important; /* Ukraine yellow */
+}
+
+.user-contributions select {
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+    width: 90%;
+    max-width: 400px;
+    color: #333 !important;
+}
+
+.user-contributions .project-details {
+    background: #ffffff !important;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-contributions .project-details h4 {
+    color: #333 !important;
+    margin-top: 0;
+}
+
+.user-contributions .project-details ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    color: #333 !important;
+}
+
+.user-contributions .project-details ul li {
+    margin-bottom: 10px;
+    color: #333 !important;
+}
+
+.user-contributions .project-details ul li strong {
+    color: #333 !important;
+}
+
+.user-contributions .project-details p {
+    color: #333 !important;
+    margin: 5px 0;
+}
+
+.user-contributions .project-details p strong {
+    color: #333 !important;
+}
+
+/* Login Required */
+.pg-login-required {
+    background-color: #555; /* Neutral gray instead of red */
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #444;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+/* Stats Grid */
+.pg-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.pg-stats-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #333;
+}
+
+.pg-stats-card h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 16px;
+}
+
+.pg-stats-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0057b7; /* Ukraine blue */
+    margin-bottom: 5px;
+}
+
+.pg-stats-label {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Success and error messages for production goal */
+.success-message {
+    background: #0057b7 !important; /* Ukraine blue */
+    color: white !important;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.error-message {
+    background: #555 !important; /* Neutral gray instead of red */
+    color: white !important;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pg-tabs-nav {
+        flex-direction: column;
+    }
+    
+    .pg-tab-button {
+        margin-right: 0;
+        margin-bottom: 0.25rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+    
+    .pg-tab-button.pg-active {
+        border-bottom-color: #dee2e6;
+    }
+    
+    .pg-tab {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+    
+    .pg-contribution-card {
+        flex-direction: column;
+    }
+    
+    .all-projects-grid,
+    .static-unfulfilled-projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .pg-button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .all-projects-grid,
+    .static-unfulfilled-projects-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .project-search-container {
+        flex-direction: column;
+    }
+    
+    #project-search {
+        width: 100%;
+    }
+}
+
+/* FIXED INPUT STYLES WITH STRONGER SELECTORS - ENSURE BLACK TEXT */
+/* Apply to every input for all cases */
+input[type="number"],
+input[type="text"],
+input.spinner,
+.pg-input-group input, 
+.pg-contribution-form input,
+.pg-form-row input,
+.progress-table input {
+    color: #333 !important;
+}
+
+/* Placeholder text color fixes for all browsers */
+/* Generic placeholder */
+input[type="number"]::placeholder,
+input[type="text"]::placeholder,
+input.spinner::placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Chrome, Safari, Edge */
+input[type="number"]::-webkit-input-placeholder,
+input[type="text"]::-webkit-input-placeholder,
+input.spinner::-webkit-input-placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Firefox */
+input[type="number"]::-moz-placeholder,
+input[type="text"]::-moz-placeholder,
+input.spinner::-moz-placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Internet Explorer */
+input[type="number"]:-ms-input-placeholder,
+input[type="text"]:-ms-input-placeholder,
+input.spinner:-ms-input-placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Edge */
+input[type="number"]::-ms-input-placeholder,
+input[type="text"]::-ms-input-placeholder,
+input.spinner::-ms-input-placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Specific case for production page form */
+.production-progress input {
+    color: #333 !important;
+}
+
+.production-progress input::placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Make sure main page form inputs are also fixed */
+form[id="production-goal-form"] input {
+    color: #333 !important;
+}
+
+form[id="production-goal-form"] input::placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Spinner inputs */
+input.spinner,
+input[type="number"].spinner {
+    color: #333 !important;
+}
+
+/* Force any other inputs to have black text */
+.production-progress table input,
+.pg-part-item input,
+form input[name="quantity"] {
+    color: #333 !important;
+}
+
+.production-progress table input::placeholder,
+.pg-part-item input::placeholder,
+form input[name="quantity"]::placeholder {
+    color: #333 !important;
+    opacity: 1 !important;
+}
