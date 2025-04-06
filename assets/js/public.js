@@ -785,9 +785,24 @@ function initProductionGoalForm(userId) {
         });
         
         // Toggle edit form visibility
-        $('.pg-edit-button').on('click', function() {
-            $(this).closest('.pg-submission-item').find('.pg-edit-form').slideToggle();
-        });
+$('.pg-edit-button').off('click').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const form = $(this).closest('.pg-submission-item').find('.pg-edit-form');
+    
+    // Ensure form stays open by using slideDown instead of slideToggle
+    if (!form.is(':visible')) {
+        form.slideDown();
+    }
+});
+
+// Make sure the cancel button also stops event propagation
+$('.edit-cancel-button').off('click').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).closest('.pg-edit-form').slideUp();
+});
         
         // Cancel button for edit forms
         $('.edit-cancel-button').on('click', function() {
