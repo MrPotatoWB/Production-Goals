@@ -29,6 +29,7 @@ class Production_Goals_Shortcodes {
     /**
      * Production Goal Shortcode
      * Displays a project's progress and allows submissions
+     * Updated to add monthly goal functionality with countdown
      */
     public function production_goal_shortcode($atts) {
         $atts = shortcode_atts(array(
@@ -42,12 +43,39 @@ class Production_Goals_Shortcodes {
         
         global $wpdb;
         $parts_table = $wpdb->prefix . "production_parts";
+        $projects_table = $wpdb->prefix . "production_projects";
+        $completed_table = $wpdb->prefix . "production_completed";
+        
+        // Get project information including whether it's monthly
+        $project = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $projects_table WHERE id = %d",
+            $project_id
+        ));
+        
+        if (!$project) {
+            return '<p>Project not found.</p>';
+        }
+        
+        // Check if this is a monthly goal
+        $is_monthly = isset($project->is_monthly) && $project->is_monthly;
         
         // Get project parts
         $parts = Production_Goals_DB::get_active_project_parts($project_id);
         
         if (empty($parts)) {
             return '<p>No active parts for this project.</p>';
+        }
+        
+        // Get previous month's progress for monthly goals
+        $previous_month_data = null;
+        if ($is_monthly) {
+            $previous_month_data = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM $completed_table 
+                 WHERE project_id = %d 
+                 ORDER BY completed_date DESC 
+                 LIMIT 1",
+                $project_id
+            ));
         }
         
         // Check if user is logged in
@@ -96,6 +124,54 @@ class Production_Goals_Shortcodes {
                 text-align: center;
                 font-weight: bold;
                 margin-bottom: 15px;
+            }
+            .monthly-goal-indicator {
+                background-color: #ffd700; /* Ukraine yellow */
+                color: #333;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                text-align: center;
+                font-weight: bold;
+            }
+            .countdown-timer {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 5px;
+                padding: 10px;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .countdown-timer-label {
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .countdown-timer-value {
+                font-size: 18px;
+                font-weight: bold;
+                color: #0057b7; /* Ukraine blue */
+            }
+            .previous-month-progress {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 5px;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            .previous-month-title {
+                font-weight: bold;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            .previous-month-part {
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }
+            .previous-month-part:last-child {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
             }
             .progress-table {
                 width: 100%;
@@ -215,6 +291,33 @@ class Production_Goals_Shortcodes {
             
             <h2>Project Progress</h2>
             
+            <?php if ($is_monthly): ?>
+                <div class="monthly-goal-indicator">
+                    This is a monthly recurring goal that resets at the end of each month
+                </div>
+                
+                <div class="countdown-timer">
+                    <div class="countdown-timer-label">Time Remaining This Month:</div>
+                    <div class="countdown-timer-value" id="monthly-countdown">Loading...</div>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($is_monthly && $previous_month_data): 
+                $prev_contributions = json_decode($previous_month_data->user_contributions, true);
+                if (!empty($prev_contributions)): ?>
+                <div class="previous-month-progress">
+                    <div class="previous-month-title">Previous Month's Progress (<?php echo date('F Y', strtotime($previous_month_data->completed_date)); ?>)</div>
+                    <?php foreach ($prev_contributions as $part_data): ?>
+                        <div class="previous-month-part">
+                            <div><strong><?php echo esc_html($part_data['part_name']); ?>:</strong> 
+                                <?php echo esc_html($part_data['progress']); ?> / <?php echo esc_html($part_data['goal']); ?> 
+                                (<?php echo round(($part_data['goal'] > 0 ? ($part_data['progress'] / $part_data['goal']) * 100 : 0), 1); ?>%)
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; endif; ?>
+            
             <form method="POST" id="production-goal-form" data-project-id="<?php echo esc_attr($project_id); ?>">
                 <input type="hidden" name="project_id" value="<?php echo esc_attr($project_id); ?>">
                 <table class="progress-table">
@@ -265,37 +368,65 @@ class Production_Goals_Shortcodes {
         </div>
         
         <script>
- jQuery(document).ready(function($) {
-    // Generate a unique form ID to prevent duplicate submissions
-    const formUniqueId = 'form-' + Math.random().toString(36).substring(2, 15);
-    const form = $('#production-goal-form');
-    
-    // Mark the form as already initialized to prevent duplicate handlers
-    form.attr({
-        'data-form-id': formUniqueId,
-        'data-initialized': 'true'
-    });
-    
-    // Don't add another submit handler here - the one in public.js will handle it
-    
-    // Create countdown elements for each row if they don't exist
-    form.find('tr').each(function() {
-        const row = $(this);
-        const partId = row.find('input[name="part_id"]').val();
-        
-        if (partId && !row.find('.pg-countdown').length) {
-            $('<div class="pg-countdown" data-part-id="' + partId + '"></div>')
-                .css({
-                    'display': 'none',
-                    'color': '#E91E63',
-                    'font-weight': 'bold',
-                    'margin-top': '5px',
-                    'text-align': 'center'
-                })
-                .appendTo(row.find('td:last'));
-        }
-    });
-});
+        jQuery(document).ready(function($) {
+            // Generate a unique form ID to prevent duplicate submissions
+            const formUniqueId = 'form-' + Math.random().toString(36).substring(2, 15);
+            const form = $('#production-goal-form');
+            
+            // Mark the form as already initialized to prevent duplicate handlers
+            form.attr({
+                'data-form-id': formUniqueId,
+                'data-initialized': 'true'
+            });
+            
+            // Don't add another submit handler here - the one in public.js will handle it
+            
+            // Create countdown elements for each row if they don't exist
+            form.find('tr').each(function() {
+                const row = $(this);
+                const partId = row.find('input[name="part_id"]').val();
+                
+                if (partId && !row.find('.pg-countdown').length) {
+                    $('<div class="pg-countdown" data-part-id="' + partId + '"></div>')
+                        .css({
+                            'display': 'none',
+                            'color': '#E91E63',
+                            'font-weight': 'bold',
+                            'margin-top': '5px',
+                            'text-align': 'center'
+                        })
+                        .appendTo(row.find('td:last'));
+                }
+            });
+            
+            <?php if ($is_monthly): ?>
+            // Initialize and update the countdown timer for monthly goals
+            function updateMonthlyCountdown() {
+                const now = new Date();
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); // Last day of current month
+                const timeRemaining = endOfMonth - now;
+                
+                // Calculate days, hours, minutes, seconds
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                
+                // Display the countdown
+                document.getElementById('monthly-countdown').textContent = 
+                    days + (days === 1 ? " day, " : " days, ") + 
+                    hours + (hours === 1 ? " hour, " : " hours, ") + 
+                    minutes + (minutes === 1 ? " minute, " : " minutes, ") + 
+                    seconds + (seconds === 1 ? " second" : " seconds");
+                
+                // Update every second
+                setTimeout(updateMonthlyCountdown, 1000);
+            }
+            
+            // Start the countdown
+            updateMonthlyCountdown();
+            <?php endif; ?>
+        });
         </script>
         <?php
         
@@ -331,8 +462,8 @@ class Production_Goals_Shortcodes {
 
         $total_pages = max(1, ceil($total_projects / $projects_per_page));
 
-        // Fetch paginated projects
-        $query = "SELECT id, name AS project_name, url AS project_url 
+        // Fetch paginated projects with monthly status
+        $query = "SELECT id, name AS project_name, url AS project_url, is_monthly 
                   FROM $projects_table 
                   $where_clause
                   ORDER BY name ASC 
@@ -380,6 +511,9 @@ class Production_Goals_Shortcodes {
                                     <?php echo esc_html($project->project_name); ?>
                                 </a>
                             </h3>
+                            <?php if (isset($project->is_monthly) && $project->is_monthly): ?>
+                                <span class="monthly-tag">Monthly</span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -398,6 +532,18 @@ class Production_Goals_Shortcodes {
         </div>
 
         <style>
+        /* Monthly Tag Styling */
+        .monthly-tag {
+            display: inline-block;
+            background-color: #ffd700; /* Ukraine yellow */
+            color: #333;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
         /* Search Bar Container */
         .project-search-container {
             display: flex;
@@ -583,8 +729,8 @@ class Production_Goals_Shortcodes {
 
         $total_pages = max(1, ceil($total_projects / $projects_per_page));
 
-        // Fetch paginated projects
-        $query = "SELECT id, name AS project_name, url AS project_url 
+        // Fetch paginated projects with monthly status
+        $query = "SELECT id, name AS project_name, url AS project_url, is_monthly 
                   FROM $projects_table 
                   $where_clause
                   ORDER BY name ASC 
@@ -628,6 +774,9 @@ class Production_Goals_Shortcodes {
                             <h3 class="project-title">
                                 <?php echo esc_html($project->project_name); ?>
                             </h3>
+                            <?php if (isset($project->is_monthly) && $project->is_monthly): ?>
+                                <span class="monthly-tag">Monthly</span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -657,6 +806,18 @@ class Production_Goals_Shortcodes {
         </div>
 
         <style>
+        /* Monthly Tag Styling */
+        .monthly-tag {
+            display: inline-block;
+            background-color: #ffd700; /* Ukraine yellow */
+            color: #333;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
         /* Active page number styling */
         .active-page {
             background-color: #0056b3 !important;
@@ -941,6 +1102,18 @@ class Production_Goals_Shortcodes {
                 margin-top: 5px;
                 color: #000 !important;
             }
+            
+            /* Monthly tag styling */
+            .monthly-tag {
+                display: inline-block;
+                background-color: #ffd700; /* Ukraine yellow */
+                color: #333;
+                font-size: 12px;
+                padding: 3px 8px;
+                border-radius: 10px;
+                margin-top: 5px;
+                font-weight: bold;
+            }
 
             /* Mobile adjustments */
             @media (max-width: 768px) {
@@ -974,6 +1147,9 @@ class Production_Goals_Shortcodes {
                                     <?php echo esc_html($project->project_name); ?>
                                 </a>
                             </h3>
+                            <?php if (isset($project->is_monthly) && $project->is_monthly): ?>
+                                <span class="monthly-tag">Monthly</span>
+                            <?php endif; ?>
                             <p class="parts-remaining">
                                 <?php echo intval($project->total_remaining); ?> parts remaining
                             </p>
@@ -1067,6 +1243,9 @@ class Production_Goals_Shortcodes {
                                     <?php echo esc_html($project->project_name); ?>
                                 </a>
                             </h3>
+                            <?php if (isset($project->is_monthly) && $project->is_monthly): ?>
+                                <span class="monthly-tag">Monthly</span>
+                            <?php endif; ?>
                             <p class="parts-remaining">
                                 <?php echo intval($project->total_remaining); ?> parts remaining
                             </p>
@@ -1150,6 +1329,18 @@ class Production_Goals_Shortcodes {
                 font-size: 16px;
                 color: #000 !important;
             }
+            
+            /* Monthly tag styling */
+            .monthly-tag {
+                display: inline-block;
+                background-color: #ffd700; /* Ukraine yellow */
+                color: #333;
+                font-size: 12px;
+                padding: 3px 8px;
+                border-radius: 10px;
+                margin-top: 5px;
+                font-weight: bold;
+            }
 
             @media (max-width: 768px) {
                 .static-unfulfilled-projects-grid {
@@ -1180,7 +1371,7 @@ class Production_Goals_Shortcodes {
 
         // Fetch active projects (Only projects with active goals)
         $active_projects = $wpdb->get_results("
-            SELECT id, name, url FROM $projects_table 
+            SELECT id, name, url, is_monthly FROM $projects_table 
             WHERE id IN (SELECT DISTINCT project_id FROM $parts_table WHERE start_date IS NOT NULL)
         ");
 
@@ -1215,7 +1406,14 @@ class Production_Goals_Shortcodes {
                 $output .= '<div class="ticker-item">';
                 $output .= '<div class="ticker-tile">'; // Tile container with white background
                 $output .= '<img src="' . esc_url($featured_image) . '" alt="Project Image" class="ticker-project-image">'; // Project Image
-                $output .= '<div class="ticker-project-title"><strong>' . esc_html($project_number) . '</strong></div>'; // Project Title
+                $output .= '<div class="ticker-project-title"><strong>' . esc_html($project_number) . '</strong>';
+                
+                // Show monthly tag if it's a monthly project
+                if (isset($project->is_monthly) && $project->is_monthly) {
+                    $output .= ' <span class="ticker-monthly-tag">Monthly</span>';
+                }
+                
+                $output .= '</div>'; // Close project title
 
                 // Contributors list (Stacked below, format "Bee #X: Y parts")
                 $output .= '<div class="ticker-contributors">';
@@ -1302,6 +1500,17 @@ class Production_Goals_Shortcodes {
                 font-weight: bold;
                 margin-bottom: 5px;
                 color: black !important;
+            }
+            
+            .ticker-monthly-tag {
+                display: inline-block;
+                background-color: #ffd700; /* Ukraine yellow */
+                color: #333;
+                font-size: 10px;
+                padding: 2px 5px;
+                border-radius: 8px;
+                font-weight: bold;
+                vertical-align: middle;
             }
 
             .ticker-contributors {
