@@ -2,7 +2,7 @@
 /*
 Plugin Name: Production Goals
 Description: Track and manage production goals with user contributions
-Version: 6.3
+Version: 7.0.1
 Author: Mr. Potato
 Text Domain: production-goals
 */
@@ -59,6 +59,12 @@ class Production_Goals {
         add_action('wp_ajax_production_goals_submit', array($this, 'ajax_submit_production'));
         add_action('wp_ajax_production_goals_edit_submission', array($this, 'ajax_edit_submission'));
         add_action('wp_ajax_production_goals_delete_submission', array($this, 'ajax_delete_submission'));
+        
+        // Monthly goals processing
+        add_action('pg_process_monthly_goals', array($this, 'process_monthly_goals'));
+        if (!wp_next_scheduled('pg_process_monthly_goals')) {
+            wp_schedule_event(strtotime('midnight'), 'daily', 'pg_process_monthly_goals');
+        }
     }
 
     /**
@@ -101,6 +107,12 @@ class Production_Goals {
         global $wpdb;
         $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'pg_lock_%'");
         
+        // Unschedule monthly goals processing
+        $timestamp = wp_next_scheduled('pg_process_monthly_goals');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'pg_process_monthly_goals');
+        }
+        
         flush_rewrite_rules();
     }
 
@@ -111,6 +123,7 @@ class Production_Goals {
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
         $submissions_table = $wpdb->prefix . "production_submissions";
+        $projects_table = $wpdb->prefix . "production_projects";
         
         // Check if updated_at field already exists
         $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$submissions_table} LIKE 'updated_at'");
@@ -139,6 +152,13 @@ class Production_Goals {
         $wpdb->query("CREATE INDEX IF NOT EXISTS idx_user_part ON {$submissions_table} (user_id, part_id)");
         $wpdb->query("CREATE INDEX IF NOT EXISTS idx_created_at ON {$submissions_table} (created_at)");
         $wpdb->query("CREATE INDEX IF NOT EXISTS idx_updated_at ON {$submissions_table} (updated_at)");
+        
+        // Check if is_monthly column exists in projects table
+        $monthly_exists = $wpdb->get_results("SHOW COLUMNS FROM {$projects_table} LIKE 'is_monthly'");
+        if (empty($monthly_exists)) {
+            // Add is_monthly field to projects table
+            $wpdb->query("ALTER TABLE {$projects_table} ADD COLUMN is_monthly TINYINT(1) DEFAULT 0");
+        }
     }
 
     /**
@@ -156,12 +176,13 @@ class Production_Goals {
         $files_table = $wpdb->prefix . "file_downloads";
         $logs_table = $wpdb->prefix . "file_download_logs";
 
-        // Create projects table
+        // Create projects table (with is_monthly field added)
         $sql1 = "CREATE TABLE IF NOT EXISTS $projects_table (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             url VARCHAR(255) DEFAULT NULL,
             material VARCHAR(255) DEFAULT NULL,
+            is_monthly TINYINT(1) DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ) $charset_collate;";
 
@@ -757,6 +778,9 @@ class Production_Goals {
             "SELECT name FROM $projects_table WHERE id = %d",
             $project_id
         ));
+        if (!$project_name) {
+            return false;
+        }
         
         // Prepare user contributions data
         $user_contributions = array();
@@ -774,6 +798,156 @@ class Production_Goals {
                 $user_info = get_userdata($contribution->user_id);
                 $part_contributions[] = array(
                     'user' => $user_info->user_login,
+                    'total' => $contribution->total
+                );
+            }
+            
+            $user_contributions[] = array(
+                'part_name' => $part->name,
+                'goal' => $part->goal,
+                'progress' => $part->progress,
+                'contributions' => $part_contributions
+            );
+        }
+        
+        // Insert the completed project
+        $wpdb->insert($completed_table, array(
+            'project_id' => $project_id,
+            'project_name' => $project_name,
+            'completed_date' => current_time('mysql'),
+            'user_contributions' => json_encode($user_contributions)
+        ));
+        
+        // Check if this is a monthly project
+        $is_monthly = $wpdb->get_var($wpdb->prepare(
+            "SELECT is_monthly FROM $projects_table WHERE id = %d",
+            $project_id
+        ));
+        
+        // Reset all parts progress
+        $wpdb->query($wpdb->prepare(
+            "UPDATE $parts_table SET progress = 0, start_date = NULL WHERE project_id = %d",
+            $project_id
+        ));
+        
+        // If it's a monthly project, restart it automatically
+        if ($is_monthly) {
+            $this->start_project($project_id);
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Start a project (set start dates for all parts with goals)
+     */
+    private function start_project($project_id) {
+        global $wpdb;
+        $parts_table = $wpdb->prefix . "production_parts";
+        
+        $start_date = current_time('mysql');
+        
+        $update_result = $wpdb->query($wpdb->prepare(
+            "UPDATE $parts_table SET start_date = %s WHERE project_id = %d AND goal > 0 AND start_date IS NULL",
+            $start_date, $project_id
+        ));
+        
+        return $update_result !== false;
+    }
+    
+    /**
+     * Process monthly goals
+     * This function checks if any monthly goals should be completed 
+     * at the end of the month
+     */
+    public function process_monthly_goals() {
+        global $wpdb;
+        $projects_table = $wpdb->prefix . "production_projects";
+        $parts_table = $wpdb->prefix . "production_parts";
+        
+        // Get all monthly projects
+        $monthly_projects = $wpdb->get_results(
+            "SELECT * FROM $projects_table WHERE is_monthly = 1"
+        );
+        
+        if (empty($monthly_projects)) {
+            return;
+        }
+        
+        // Check if we're at the end of the month
+        $today = new DateTime();
+        $tomorrow = new DateTime('tomorrow');
+        $is_end_of_month = $today->format('m') != $tomorrow->format('m');
+        
+        // Process if it's end of month
+        if ($is_end_of_month) {
+            foreach ($monthly_projects as $project) {
+                // Get active parts for this project
+                $active_parts = $wpdb->get_results($wpdb->prepare(
+                    "SELECT * FROM $parts_table 
+                     WHERE project_id = %d AND start_date IS NOT NULL",
+                    $project->id
+                ));
+                
+                if (!empty($active_parts)) {
+                    // Complete the project regardless of progress
+                    $this->complete_monthly_project($project->id);
+                    
+                    // Start the project again for the new month
+                    $this->start_project($project->id);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Complete a monthly project
+     * Similar to check_project_completion but forces completion 
+     * regardless of progress
+     */
+    private function complete_monthly_project($project_id) {
+        global $wpdb;
+        
+        $parts_table = $wpdb->prefix . "production_parts";
+        $submissions_table = $wpdb->prefix . "production_submissions";
+        $projects_table = $wpdb->prefix . "production_projects";
+        $completed_table = $wpdb->prefix . "production_completed";
+        
+        // Get all active parts
+        $all_parts = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $parts_table WHERE project_id = %d AND start_date IS NOT NULL",
+            $project_id
+        ));
+        
+        if (empty($all_parts)) {
+            return false;
+        }
+        
+        // Get project name
+        $project_name = $wpdb->get_var($wpdb->prepare(
+            "SELECT name FROM $projects_table WHERE id = %d",
+            $project_id
+        ));
+        if (!$project_name) {
+            return false;
+        }
+        
+        // Prepare user contributions data
+        $user_contributions = array();
+        foreach ($all_parts as $part) {
+            $contributions = $wpdb->get_results($wpdb->prepare(
+                "SELECT user_id, SUM(quantity) as total 
+                 FROM $submissions_table 
+                 WHERE part_id = %d AND created_at >= %s 
+                 GROUP BY user_id",
+                $part->id, $part->start_date ?? '1970-01-01 00:00:00'
+            ));
+            
+            $part_contributions = array();
+            foreach ($contributions as $contribution) {
+                $user_info = get_userdata($contribution->user_id);
+                $part_contributions[] = array(
+                    'user' => $user_info ? $user_info->user_login : 'User ' . $contribution->user_id,
                     'total' => $contribution->total
                 );
             }
