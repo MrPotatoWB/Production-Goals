@@ -209,7 +209,8 @@ class Production_Goals_Admin {
         } else {
             foreach ($projects as $project) {
                 $is_active = $project->id == $selected_project_id ? 'selected' : '';
-                echo '<option value="' . esc_attr($project->id) . '" ' . $is_active . '>' . esc_html($project->name) . '</option>';
+                $is_monthly = isset($project->is_monthly) && $project->is_monthly ? ' (Monthly)' : '';
+                echo '<option value="' . esc_attr($project->id) . '" ' . $is_active . '>' . esc_html($project->name) . $is_monthly . '</option>';
             }
         }
 
@@ -227,6 +228,10 @@ class Production_Goals_Admin {
                 echo '<span class="pg-status-label pg-status-active">Active</span>';
             } else {
                 echo '<span class="pg-status-label pg-status-inactive">Inactive</span>';
+            }
+            // Show monthly indicator if this is a monthly project
+            if (isset($selected_project->is_monthly) && $selected_project->is_monthly) {
+                echo ' <span class="pg-status-label pg-status-monthly">Monthly Recurring</span>';
             }
             echo '</div>';
             echo '</div>';
@@ -250,6 +255,13 @@ class Production_Goals_Admin {
             echo '<label for="edit_project_material">Materials:</label>';
             echo '<input type="text" id="edit_project_material" name="project_material" value="' . esc_attr(implode(', ', $materials)) . '" placeholder="e.g., PLA, ABS">';
             echo '<p class="pg-form-help">Separate multiple materials with commas (e.g., PLA, ABS)</p>';
+            echo '</div>';
+
+            // Monthly recurring checkbox
+            echo '<div class="pg-form-row">';
+            echo '<label for="edit_is_monthly">Monthly Recurring Goal:</label>';
+            echo '<input type="checkbox" id="edit_is_monthly" name="is_monthly" value="1" ' . (isset($selected_project->is_monthly) && $selected_project->is_monthly ? 'checked' : '') . '>';
+            echo '<p class="pg-form-help">If checked, this project will automatically complete at the end of each month and start again.</p>';
             echo '</div>';
 
             echo '<div class="pg-form-row">';
@@ -679,6 +691,11 @@ class Production_Goals_Admin {
             padding: 8px;
             border-radius: 4px;
         }
+        .pg-status-monthly {
+            background-color: #ffd700; /* Ukraine yellow */
+            color: #333;
+            border: 1px solid #e6c200;
+        }
         </style>';
         ?>
         <script>
@@ -693,6 +710,11 @@ class Production_Goals_Admin {
                 const formData = new FormData(form[0]);
                 formData.append('action', 'pg_edit_project');
                 formData.append('nonce', productionGoalsAdmin.nonce);
+                
+                // Handle checkbox properly for is_monthly
+                if (!form.find('#edit_is_monthly').is(':checked')) {
+                    formData.set('is_monthly', '0');
+                }
 
                 $.ajax({
                     url: productionGoalsAdmin.ajaxUrl,
@@ -1002,6 +1024,13 @@ class Production_Goals_Admin {
         echo '<input type="text" id="project_material" name="project_material" placeholder="Material (e.g., PLA, ABS)" required>';
         echo '<p class="pg-form-help">Separate multiple materials with commas (e.g., PLA, ABS)</p>';
         echo '</div>';
+        
+        // Monthly recurring checkbox
+        echo '<div class="pg-form-row">';
+        echo '<label for="is_monthly">Monthly Recurring Goal:</label>';
+        echo '<input type="checkbox" id="is_monthly" name="is_monthly" value="1">';
+        echo '<p class="pg-form-help">If checked, this project will automatically complete at the end of each month and start again.</p>';
+        echo '</div>';
 
         echo '<div class="pg-form-row">';
         echo '<label for="project_file">Project File (ZIP):</label>';
@@ -1045,6 +1074,11 @@ class Production_Goals_Admin {
                 const formData = new FormData(form[0]);
                 formData.append('action', 'pg_add_project');
                 formData.append('nonce', productionGoalsAdmin.nonce);
+                
+                // Handle checkbox properly for is_monthly
+                if (!form.find('#is_monthly').is(':checked')) {
+                    formData.append('is_monthly', '0');
+                }
 
                 $.ajax({
                     url: productionGoalsAdmin.ajaxUrl,
@@ -1300,6 +1334,7 @@ class Production_Goals_Admin {
         $project_name = isset($_POST['project_name']) ? sanitize_text_field($_POST['project_name']) : '';
         $project_url = isset($_POST['project_url']) ? esc_url_raw($_POST['project_url']) : '';
         $materials_raw = isset($_POST['project_material']) ? array_map('trim', explode(',', sanitize_text_field($_POST['project_material']))) : [];
+        $is_monthly = isset($_POST['is_monthly']) ? 1 : 0;
 
         if (empty($project_name) || empty($project_url)) {
              wp_send_json_error(array('message' => 'Project Name and URL are required.'));
@@ -1308,6 +1343,7 @@ class Production_Goals_Admin {
         $insert_result = $wpdb->insert($projects_table, array(
             'name' => $project_name,
             'url' => $project_url,
+            'is_monthly' => $is_monthly,
             'created_at' => current_time('mysql')
         ));
 
@@ -1373,7 +1409,9 @@ class Production_Goals_Admin {
         $project_name = isset($_POST['project_name']) ? sanitize_text_field($_POST['project_name']) : '';
         $project_url = isset($_POST['project_url']) ? esc_url_raw($_POST['project_url']) : '';
         $materials_raw = isset($_POST['project_material']) ? array_map('trim', explode(',', sanitize_text_field($_POST['project_material']))) : [];
-        pg_debug_log("AJAX: Processing Name: '$project_name', URL: '$project_url'");
+        $is_monthly = isset($_POST['is_monthly']) ? 1 : 0;
+
+        pg_debug_log("AJAX: Processing Name: '$project_name', URL: '$project_url', Monthly: '$is_monthly'");
 
          if (empty($project_name) || empty($project_url)) {
              pg_debug_log("AJAX ERROR: Project Name or URL is empty.");
@@ -1384,7 +1422,8 @@ class Production_Goals_Admin {
         pg_debug_log("AJAX: Attempting project details update in DB...");
         $update_result = $wpdb->update($projects_table, array(
             'name' => $project_name,
-            'url' => $project_url
+            'url' => $project_url,
+            'is_monthly' => $is_monthly
         ), array('id' => $project_id));
 
         if ($update_result === false) {
@@ -1574,6 +1613,20 @@ class Production_Goals_Admin {
         $wpdb->query($wpdb->prepare(
             "UPDATE $parts_table SET progress = 0, start_date = NULL WHERE project_id = %d", $project_id
         ));
+        
+        // Check if this is a monthly project and restart it if it is
+        $is_monthly = $wpdb->get_var($wpdb->prepare(
+            "SELECT is_monthly FROM $projects_table WHERE id = %d", $project_id
+        ));
+        
+        if ($is_monthly) {
+            // Restart the project automatically
+            $start_date = current_time('mysql');
+            $wpdb->query($wpdb->prepare(
+                "UPDATE $parts_table SET start_date = %s WHERE project_id = %d AND goal > 0", 
+                $start_date, $project_id
+            ));
+        }
 
         wp_send_json_success(array(
             'message' => 'Project marked as complete successfully!'
