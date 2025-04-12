@@ -109,6 +109,11 @@ class Production_Goals_User_Interface {
         // Build the all_projects array using ALL projects from database
         $all_projects = array();
         foreach ($all_db_projects as $project) {
+            // Skip projects the user doesn't have permission to view
+            if (!Production_Goals_Utilities::can_user_view_project($project->id)) {
+                continue;
+            }
+            
             $project_status = isset($project_status_map[$project->id]) ? $project_status_map[$project->id] : 'inactive';
             
             $project_data = array(
@@ -143,13 +148,22 @@ class Production_Goals_User_Interface {
             }
         }
         
-        // Get selected project details
-        $selected_project = null;
+        // Check if the selected project is in the user's visible projects
+        $selected_project_visible = false;
         foreach ($all_projects as $project) {
             if ($project['id'] == $selected_project_id) {
+                $selected_project_visible = true;
                 $selected_project = $project;
                 break;
             }
+        }
+        
+        // If selected project is not visible to user, select the first visible project
+        if (!$selected_project_visible && !empty($all_projects)) {
+            $selected_project_id = $all_projects[0]['id'];
+            $selected_project = $all_projects[0];
+        } elseif (!$selected_project_visible) {
+            $selected_project = null;
         }
         
         // Start output buffering
