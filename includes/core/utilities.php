@@ -191,6 +191,72 @@ class Production_Goals_Utilities {
         
         return true;
     }
+
+    /**
+     * Check if a user has permission to view a project
+     * Uses the same security level logic as file downloads
+     *
+     * @param int $project_id Project ID to check
+     * @param int $user_id User ID to check (defaults to current user)
+     * @return bool True if user has permission, false otherwise
+     */
+    public static function can_user_view_project($project_id, $user_id = null) {
+        if (!$user_id) {
+            $user_id = get_current_user_id();
+        }
+        
+        // Admin and WBAdmin users can view all projects
+        if (current_user_can('administrator') || current_user_can('wbadmin')) {
+            return true;
+        }
+        
+        // Get the file associated with this project
+        global $wpdb;
+        $file_table = $wpdb->prefix . "file_downloads";
+        
+        $file = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $file_table WHERE project_id = %d ORDER BY id DESC LIMIT 1",
+            $project_id
+        ));
+        
+        // If no file is associated with this project, default to allowing view
+        if (!$file || empty($file->allowed_roles)) {
+            return true;
+        }
+        
+        // Get user roles
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return false;
+        }
+        
+        $user_roles = array_map('strtolower', (array) $user->roles);
+        $allowed_roles = array_map('strtolower', explode(',', $file->allowed_roles));
+        
+        // Check if the project has any security level set
+        $has_wb1 = in_array('wb1', $allowed_roles);
+        $has_wb2 = in_array('wb2', $allowed_roles);
+        $has_wb3 = in_array('wb3', $allowed_roles);
+        
+        // Now check based on the security level hierarchy
+        // If user is WB1, they can see WB1 projects
+        if (in_array('wb1', $user_roles) && $has_wb1) {
+            return true;
+        }
+        
+        // If user is WB2, they can see WB1 or WB2 projects
+        if (in_array('wb2', $user_roles) && ($has_wb1 || $has_wb2)) {
+            return true;
+        }
+        
+        // If user is WB3, they can see WB1, WB2, or WB3 projects
+        if (in_array('wb3', $user_roles)) {
+            return true;
+        }
+        
+        // Administrator and wbadmin were already handled earlier
+        return false;
+    }
     
     /**
      * Create a simple table from data array
