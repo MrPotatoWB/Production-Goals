@@ -22,8 +22,6 @@ class Production_Goals_Shortcodes {
         add_shortcode('most_unfulfilled_goals', array($this, 'most_unfulfilled_goals_shortcode'));
         add_shortcode('static_unfulfilled_projects', array($this, 'static_unfulfilled_projects_shortcode'));
         add_shortcode('production_goal_ticker', array($this, 'production_goal_ticker_shortcode'));
-        // Note: group_totals, user_lifetime_contributions, historical_submissions, and corrections
-        // shortcodes have been removed as they're now included in [my_projects]
     }
     
     /**
@@ -39,6 +37,11 @@ class Production_Goals_Shortcodes {
         $project_id = intval($atts['id']);
         if ($project_id === 0) {
             return '<p>Invalid project ID.</p>';
+        }
+        
+        // Check if user has permission to view this project
+        if (!Production_Goals_Utilities::can_user_view_project($project_id)) {
+            return ''; // Return empty string if no permission
         }
         
         global $wpdb;
@@ -455,23 +458,30 @@ class Production_Goals_Shortcodes {
         $where_clause = !empty($search_query) ? "WHERE name LIKE %s" : "";
         $search_param = !empty($search_query) ? '%' . $wpdb->esc_like($search_query) . '%' : '';
 
-        // Get total projects count
-        $total_projects = !empty($search_query) 
-            ? $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $projects_table $where_clause", $search_param))
-            : $wpdb->get_var("SELECT COUNT(*) FROM $projects_table");
-
-        $total_pages = max(1, ceil($total_projects / $projects_per_page));
-
-        // Fetch paginated projects with monthly status
+        // Fetch projects without pagination first to filter by permission
         $query = "SELECT id, name AS project_name, url AS project_url, is_monthly 
                   FROM $projects_table 
                   $where_clause
-                  ORDER BY name ASC 
-                  LIMIT %d OFFSET %d";
-
-        $projects = !empty($search_query)
-            ? $wpdb->get_results($wpdb->prepare($query, $search_param, $projects_per_page, $offset))
-            : $wpdb->get_results($wpdb->prepare($query, $projects_per_page, $offset));
+                  ORDER BY name ASC";
+        
+        $all_projects = !empty($search_query)
+            ? $wpdb->get_results($wpdb->prepare($query, $search_param))
+            : $wpdb->get_results($query);
+        
+        // Filter projects based on user permissions
+        $filtered_projects = array();
+        foreach ($all_projects as $project) {
+            if (Production_Goals_Utilities::can_user_view_project($project->id)) {
+                $filtered_projects[] = $project;
+            }
+        }
+        
+        // Recalculate pagination based on filtered projects
+        $total_projects = count($filtered_projects);
+        $total_pages = max(1, ceil($total_projects / $projects_per_page));
+        
+        // Get the current page of projects
+        $projects = array_slice($filtered_projects, $offset, $projects_per_page);
 
         // Generate pagination URLs
         $base_url = remove_query_arg(['project_page']);
@@ -722,23 +732,30 @@ class Production_Goals_Shortcodes {
         $where_clause = !empty($search_query) ? "WHERE name LIKE %s" : "";
         $search_param = !empty($search_query) ? '%' . $wpdb->esc_like($search_query) . '%' : '';
 
-        // Get total projects count
-        $total_projects = !empty($search_query) 
-            ? $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $projects_table $where_clause", $search_param))
-            : $wpdb->get_var("SELECT COUNT(*) FROM $projects_table");
-
-        $total_pages = max(1, ceil($total_projects / $projects_per_page));
-
-        // Fetch paginated projects with monthly status
+        // Fetch projects without pagination first to filter by permission
         $query = "SELECT id, name AS project_name, url AS project_url, is_monthly 
                   FROM $projects_table 
                   $where_clause
-                  ORDER BY name ASC 
-                  LIMIT %d OFFSET %d";
-
-        $projects = !empty($search_query)
-            ? $wpdb->get_results($wpdb->prepare($query, $search_param, $projects_per_page, $offset))
-            : $wpdb->get_results($wpdb->prepare($query, $projects_per_page, $offset));
+                  ORDER BY name ASC";
+        
+        $all_projects = !empty($search_query)
+            ? $wpdb->get_results($wpdb->prepare($query, $search_param))
+            : $wpdb->get_results($query);
+        
+        // Filter projects based on user permissions
+        $filtered_projects = array();
+        foreach ($all_projects as $project) {
+            if (Production_Goals_Utilities::can_user_view_project($project->id)) {
+                $filtered_projects[] = $project;
+            }
+        }
+        
+        // Recalculate pagination based on filtered projects
+        $total_projects = count($filtered_projects);
+        $total_pages = max(1, ceil($total_projects / $projects_per_page));
+        
+        // Get the current page of projects
+        $projects = array_slice($filtered_projects, $offset, $projects_per_page);
 
         // Generate pagination URLs
         $base_url = remove_query_arg(['project_page']);
@@ -999,6 +1016,17 @@ class Production_Goals_Shortcodes {
         // Fetch projects with active goals
         $projects = Production_Goals_DB::get_unfulfilled_projects();
         
+        // Filter projects based on user permissions
+        $filtered_projects = array();
+        foreach ($projects as $project) {
+            if (Production_Goals_Utilities::can_user_view_project($project->id)) {
+                $filtered_projects[] = $project;
+            }
+        }
+        
+        // Use filtered projects
+        $projects = $filtered_projects;
+        
         // Handle no projects found
         if (empty($projects)) {
             return '<p>No projects found with unfulfilled active goals.</p>';
@@ -1217,6 +1245,17 @@ class Production_Goals_Shortcodes {
         // Fetch projects with active unfulfilled goals
         $projects = Production_Goals_DB::get_unfulfilled_projects();
         
+        // Filter projects based on user permissions
+        $filtered_projects = array();
+        foreach ($projects as $project) {
+            if (Production_Goals_Utilities::can_user_view_project($project->id)) {
+                $filtered_projects[] = $project;
+            }
+        }
+        
+        // Use filtered projects
+        $projects = $filtered_projects;
+        
         // Render the HTML output
         ob_start();
         ?>
@@ -1374,6 +1413,17 @@ class Production_Goals_Shortcodes {
             SELECT id, name, url, is_monthly FROM $projects_table 
             WHERE id IN (SELECT DISTINCT project_id FROM $parts_table WHERE start_date IS NOT NULL)
         ");
+        
+        // Filter projects based on user permissions
+        $filtered_projects = array();
+        foreach ($active_projects as $project) {
+            if (Production_Goals_Utilities::can_user_view_project($project->id)) {
+                $filtered_projects[] = $project;
+            }
+        }
+        
+        // Use filtered projects
+        $active_projects = $filtered_projects;
 
         if (!$active_projects) {
             return '<div class="production-ticker-container"><div class="production-ticker"><div class="ticker-item">No active projects.</div></div></div>';
